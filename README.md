@@ -9,7 +9,7 @@
 # Usage
 
 ```bash
-python main.py --dataset=cifar10 --lr=0.01 --t_train=False --num_sample=24000 --batch_size=100
+python main.py --dataset=mnist --lr=3.0 --t_train=False --num_sample=24000 --batch_size=100
 ```
 
 # TO-DO
