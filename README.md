@@ -11,3 +11,7 @@
 ```bash
 python main.py --dataset=cifar10 --lr=0.01 --t_train=False --num_sample=24000 --batch_size=100
 ```
+
+# TO-DO
+
+Hard to repruduce the results in paper. The paper author also does not reply.
