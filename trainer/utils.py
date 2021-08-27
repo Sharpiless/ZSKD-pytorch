@@ -1,4 +1,5 @@
 import torchvision.transforms as transforms
+from torchvision.transforms.transforms import RandomAffine, RandomRotation
 
 
 def transformer(dataset):
@@ -12,6 +13,8 @@ def transformer(dataset):
         
     elif dataset == 'cifar10' or dataset == 'cifar100':
         train_trans = transforms.Compose([
+                transforms.RandomRotation(90),
+                transforms.RandomAffine(degrees=0, translate=(0.0, 0.2), scale=(0.6, 1.0)),
                 transforms.RandomCrop(32, padding=4),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor(),

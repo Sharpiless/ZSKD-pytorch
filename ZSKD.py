@@ -5,21 +5,11 @@ import torch
 import torch.nn.functional as F
 import torchvision.utils as vutils
 from torch.autograd import Variable
-from torch import autograd
 from utils import data_info
 
 
-def compute_wasserstein_distance(logit, y, inputs):
-    mask = y - 0.5
-    loss = logit * mask * 2
-    gradients = autograd.grad(outputs=logit, inputs=inputs,
-                              grad_outputs=torch.ones(logit.size()).cuda(),
-                              create_graph=True, retain_graph=True, only_inputs=True)[0]
-    return loss.mean() + ((gradients.norm(2, dim=1) - 1) ** 2).mean()
-
-
 class ZSKD():
-    def __init__(self, dataset, teacher, num_sample, beta, t, batch_size, lr, iters, wasserstein):
+    def __init__(self, dataset, teacher, num_sample, beta, t, batch_size, lr, iters, kl):
         self.dataset = dataset
         self.cwh, self.num_classes, self.student = data_info(self.dataset)
         self.teacher = teacher
@@ -29,7 +19,7 @@ class ZSKD():
         self.batch_size = batch_size
         self.lr = lr
         self.iters = iters
-        self.wasserstein = wasserstein
+        self.kl = kl
 
         self.gen_num = 1
 
@@ -79,8 +69,8 @@ class ZSKD():
                     for n_iter in range(self.iters):
                         optimizer.zero_grad()
                         logit = self.teacher(inputs) / 20.0
-                        if self.wasserstein:
-                            l = compute_wasserstein_distance(logit, y, inputs)
+                        if self.kl:
+                            l = 20 **2 * F.kl_div(F.log_softmax(logit, dim=1), y.detach(), size_average=False) / y.size(0)
                         else:
                             l = -torch.sum(F.log_softmax(logit / 20.0,
                                         dim=1) * y.detach()) / y.size(0)
